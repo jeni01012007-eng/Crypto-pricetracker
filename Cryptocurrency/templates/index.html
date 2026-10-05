@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CryptoTrack | Cryptocurrency Price Tracker</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #0b1120;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        .header {
+            background: #111827;
+            border-bottom: 1px solid #243047;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo h1 {
+            font-size: 21px;
+        }
+
+        .logo span {
+            color: #818cf8;
+        }
+
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        /* MAIN */
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 35px auto;
+        }
+
+        .welcome {
+            margin-bottom: 28px;
+        }
+
+        .welcome h2 {
+            font-size: 30px;
+            margin-bottom: 7px;
+        }
+
+        .welcome p {
+            color: #94a3b8;
+        }
+
+        /* STAT CARDS */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #243047;
+            border-radius: 16px;
+            padding: 22px;
+            transition: 0.25s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: #6366f1;
+        }
+
+        .card-title {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .card-sub {
+            color: #22c55e;
+            font-size: 12px;
+            margin-top: 7px;
+        }
+
+        /* CONTROLS */
+
+        .controls {
+            background: #111827;
+            border: 1px solid #243047;
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .search-box input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0b1120;
+            border: 1px solid #334155;
+            color: white;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .search-box input:focus,
+        select:focus {
+            border-color: #6366f1;
+        }
+
+        select {
+            width: 190px;
+        }
+
+        .btn {
+            text-decoration: none;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .download-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        /* COMMON CARD */
+
+        .table-card {
+            background: #111827;
+            border: 1px solid #243047;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* PERFORMANCE */
+
+        .performance-card {
+            margin-bottom: 20px;
+        }
+
+        .performance-content {
+            padding: 25px;
+        }
+
+        .performance-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 16px;
+        }
+
+        .performance-name {
+            width: 150px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .bar-container {
+            flex: 1;
+            height: 10px;
+            background: #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar-positive {
+            height: 100%;
+            background: #22c55e;
+            border-radius: 10px;
+        }
+
+        .bar-negative {
+            height: 100%;
+            background: #ef4444;
+            border-radius: 10px;
+        }
+
+        .performance-value {
+            width: 65px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .value-positive {
+            color: #22c55e;
+        }
+
+        .value-negative {
+            color: #ef4444;
+        }
+
+        /* TABLE HEADER */
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #243047;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+        }
+
+        .table-header span {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding: 15px 20px;
+            background: #0f172a;
+        }
+
+        td {
+            padding: 17px 20px;
+            border-top: 1px solid #1e293b;
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #172033;
+        }
+
+        .coin-name {
+            font-weight: 600;
+        }
+
+        .rank {
+            color: #64748b;
+        }
+
+        .positive {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .price {
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            padding: 30px;
+            font-size: 12px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1000px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 15px 4%;
+            }
+
+            .live-status {
+                display: none;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+            .welcome h2 {
+                font-size: 24px;
+            }
+
+            .performance-name {
+                width: 110px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                ₿
+            </div>
+
+            <div>
+                <h1>Crypto<span>Track</span></h1>
+            </div>
+
+        </div>
+
+
+        <div class="live-status">
+
+            <div class="live-dot"></div>
+
+            Live Market Data
+
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+
+        <!-- WELCOME -->
+
+        <div class="welcome">
+
+            <h2>Cryptocurrency Market</h2>
+
+            <p>
+                Monitor real-time prices, market changes and cryptocurrency performance.
+            </p>
+
+        </div>
+
+
+        <!-- STAT CARDS -->
+
+        <div class="stats">
+
+
+            <!-- TOTAL COINS -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    TOTAL COINS
+                </div>
+
+                <div class="card-value">
+                    {{ coins|length }}
+                </div>
+
+                <div class="card-sub">
+                    Top 10 tracked
+                </div>
+
+            </div>
+
+
+            <!-- TOP GAINER -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    TOP GAINER
+                </div>
+
+                {% if top_gainer %}
+
+                    <div class="card-value">
+                        {{ top_gainer.coin }}
+                    </div>
+
+                    <div class="card-sub">
+                        ▲ {{ top_gainer.change_24h }}
+                    </div>
+
+                {% else %}
+
+                    <div class="card-value">
+                        -
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- HIGHEST PRICE -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    HIGHEST PRICE
+                </div>
+
+                {% if coins %}
+
+                    {% set highest = coins | sort(attribute='price_value', reverse=true) | first %}
+
+                    <div class="card-value">
+                        {{ highest.price }}
+                    </div>
+
+                    <div class="card-sub">
+                        {{ highest.coin }}
+                    </div>
+
+                {% else %}
+
+                    <div class="card-value">
+                        -
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- LATEST UPDATE -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    LATEST UPDATE
+                </div>
+
+                {% if coins %}
+
+                    <div class="card-value" style="font-size:17px;">
+                        {{ coins[0].timestamp }}
+                    </div>
+
+                    <div class="card-sub">
+                        Data refreshed
+                    </div>
+
+                {% else %}
+
+                    <div class="card-value">
+                        -
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <div class="controls">
+
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    id="coinSearch"
+                    placeholder="🔍 Search cryptocurrency..."
+                    onkeyup="applyFilters()"
+                >
+
+            </div>
+
+
+            <select
+                id="changeFilter"
+                onchange="applyFilters()"
+            >
+
+                <option value="all">
+                    All Coins
+                </option>
+
+                <option value="1">
+                    1% or More
+                </option>
+
+                <option value="2">
+                    2% or More
+                </option>
+
+                <option value="5">
+                    5% or More
+                </option>
+
+                <option value="10">
+                    10% or More
+                </option>
+
+            </select>
+
+
+            <a
+                href="/update"
+                class="btn refresh-btn"
+            >
+                🔄 Fetch Live Data
+            </a>
+
+
+            <a
+                href="/download"
+                class="btn download-btn"
+            >
+                ⬇ Download CSV
+            </a>
+
+
+        </div>
+
+
+        <!-- 24H PERFORMANCE -->
+
+        <div class="table-card performance-card">
+
+
+            <div class="table-header">
+
+                <div>
+                    <h3>
+                        24h Market Performance
+                    </h3>
+                </div>
+
+                <span>
+                    Percentage change
+                </span>
+
+            </div>
+
+
+            <div class="performance-content">
+
+
+                {% for coin in coins %}
+
+                    <div class="performance-row">
+
+
+                        <div class="performance-name">
+
+                            {{ coin.coin }}
+
+                        </div>
+
+
+                        <div class="bar-container">
+
+                            {% if coin.change_value >= 0 %}
+
+                                <div
+                                    class="bar-positive"
+                                    style="width: {{ [coin.change_value * 10, 100] | min }}%;"
+                                ></div>
+
+                            {% else %}
+
+                                <div
+                                    class="bar-negative"
+                                    style="width: {{ [(-coin.change_value) * 10, 100] | min }}%;"
+                                ></div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div
+                            class="performance-value
+                            {% if coin.change_value >= 0 %}
+                                value-positive
+                            {% else %}
+                                value-negative
+                            {% endif %}"
+                        >
+
+                            {{ coin.change_24h }}
+
+                        </div>
+
+
+                    </div>
+
+                {% endfor %}
+
+
+            </div>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="table-card">
+
+
+            <div class="table-header">
+
+                <div>
+                    <h3>
+                        Top 10 Cryptocurrencies
+                    </h3>
+                </div>
+
+                <span>
+                    Live market tracking
+                </span>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Rank
+                            </th>
+
+                            <th>
+                                Cryptocurrency
+                            </th>
+
+                            <th>
+                                Price
+                            </th>
+
+                            <th>
+                                24h Change
+                            </th>
+
+                            <th>
+                                Market Cap
+                            </th>
+
+                            <th>
+                                Updated
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for coin in coins %}
+
+
+                            <tr>
+
+
+                                <td class="rank">
+                                    #{{ coin.rank }}
+                                </td>
+
+
+                                <td class="coin-name">
+                                    🪙 {{ coin.coin }}
+                                </td>
+
+
+                                <td class="price">
+                                    {{ coin.price }}
+                                </td>
+
+
+                                <td
+                                    class="
+                                    {% if '-' in coin.change_24h %}
+                                        negative
+                                    {% else %}
+                                        positive
+                                    {% endif %}
+                                    "
+                                >
+
+                                    {{ coin.change_24h }}
+
+                                </td>
+
+
+                                <td>
+                                    {{ coin.market_cap }}
+                                </td>
+
+
+                                <td>
+                                    {{ coin.timestamp }}
+                                </td>
+
+
+                            </tr>
+
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+
+                </table>
+
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        Cryptocurrency Price Tracker
+        •
+        Real-Time Market Monitoring
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        function applyFilters() {
+
+            const searchValue =
+                document
+                .getElementById("coinSearch")
+                .value
+                .toLowerCase();
+
+
+            const selectedValue =
+                document
+                .getElementById("changeFilter")
+                .value;
+
+
+            const rows =
+                document.querySelectorAll("tbody tr");
+
+
+            rows.forEach(row => {
+
+
+                const coinName =
+                    row.cells[1]
+                    .textContent
+                    .toLowerCase();
+
+
+                const changeText =
+                    row.cells[3]
+                    .textContent
+                    .replace("%", "")
+                    .trim();
+
+
+                const change =
+                    parseFloat(changeText);
+
+
+                const matchesSearch =
+                    coinName.includes(searchValue);
+
+
+                const matchesFilter =
+                    selectedValue === "all"
+                    ||
+                    change >= parseFloat(selectedValue);
+
+
+                if (
+                    matchesSearch &&
+                    matchesFilter
+                ) {
+
+                    row.style.display = "";
+
+                } else {
+
+                    row.style.display = "none";
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
